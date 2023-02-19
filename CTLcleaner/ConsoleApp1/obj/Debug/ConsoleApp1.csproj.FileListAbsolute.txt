@@ -1,0 +1,7 @@
+Z:\CTLcleaner\CTLcleaner\CTLcleaner\ConsoleApp1\bin\Debug\ConsoleApp1.exe.config
+Z:\CTLcleaner\CTLcleaner\CTLcleaner\ConsoleApp1\bin\Debug\ConsoleApp1.exe
+Z:\CTLcleaner\CTLcleaner\CTLcleaner\ConsoleApp1\bin\Debug\ConsoleApp1.pdb
+Z:\CTLcleaner\CTLcleaner\CTLcleaner\ConsoleApp1\obj\Debug\ConsoleApp1.csprojAssemblyReference.cache
+Z:\CTLcleaner\CTLcleaner\CTLcleaner\ConsoleApp1\obj\Debug\ConsoleApp1.csproj.CoreCompileInputs.cache
+Z:\CTLcleaner\CTLcleaner\CTLcleaner\ConsoleApp1\obj\Debug\ConsoleApp1.exe
+Z:\CTLcleaner\CTLcleaner\CTLcleaner\ConsoleApp1\obj\Debug\ConsoleApp1.pdb
