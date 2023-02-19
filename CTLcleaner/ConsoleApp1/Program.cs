@@ -7,15 +7,14 @@ using System.Threading.Tasks;
 
 namespace ConsoleApp1
 {
-
     class Program
     {
         static void Main(string[] args)
         {
-            string mainPath = $@"OUT\ENV"; // корневой каталог в котором происходит поиск файлов
+            string mainPath = $@"C:\Program Files (x86)\InfoTeCS\ViPNet Coordinator\out\ENV"; // корневой каталог в котором происходит поиск файлов
             string removePath = $@"removedCTL\"; // папка в которую переносится файл
             string[] allDirs; // массив со всеми папками out
-            string textPattern = "*.CTL"; // паттерн поиска файлов
+            string textPattern = "*.CTL"; // маска файлов
             double daysTriger = 14; // количество дней
             DateTime nowDate = DateTime.Now; // текущая дата, сегодняшний день
 
