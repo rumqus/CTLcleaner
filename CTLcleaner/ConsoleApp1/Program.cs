@@ -12,13 +12,13 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            string mainPath = $@"out\ENV"; // корневой каталог в котором происходит поиск файлов
+            string mainPath = $@"OUT\ENV"; // корневой каталог в котором происходит поиск файлов
             string removePath = $@"removedCTL\"; // папка в которую переносится файл
             string[] allDirs; // массив со всеми папками out
-            string tempFile; // файл
             string textPattern = "*.CTL"; // паттерн поиска файлов
-            double daysTriger = 0; // количество дней
+            double daysTriger = 14; // количество дней
             DateTime nowDate = DateTime.Now; // текущая дата, сегодняшний день
+
 
             GetAllDirs();
             GetFilesInDir();
@@ -40,7 +40,7 @@ namespace ConsoleApp1
                 }
                 else
                 {
-                    Console.WriteLine("ERROR - root array is null");
+                    WriteError("ERROR - root array is null");
                 }
             }
 
@@ -52,19 +52,19 @@ namespace ConsoleApp1
             {
                 if (allDirs != null)
                 {
-                    for (int i = 0; i <allDirs.Length; i++)
+                    for (int i = 0; i < allDirs.Length; i++)
                     {
                         if (Directory.GetFiles(allDirs[i]).Length > 0)
                         {
                             string[] tempLocalDir = Directory.GetFiles(allDirs[i], textPattern); // отбираем все файлы с расширением CTL
-                            Console.WriteLine($@"папка {allDirs[i]} считана - ОК");
+                            WriteOK($@"папка {allDirs[i]} считана - ОК");
                             CompareFiles(tempLocalDir);
                         }
                     }
                 }
                 else
                 {
-                    Console.WriteLine("ERROR - root array is null");
+                    WriteError("ERROR - root array is null");
                 }
             }
 
@@ -72,7 +72,7 @@ namespace ConsoleApp1
             /// Метод сравнения файлов с уловиями
             /// Перебирает файлы в каталоге и сравнивает с условиями
             /// </summary>
-            void CompareFiles(string[] tempDir) 
+            void CompareFiles(string[] tempDir)
             {
                 for (int i = 0; i < tempDir.Length; i++)
                 {
@@ -83,44 +83,41 @@ namespace ConsoleApp1
                     {
                         RemoveFile(tempDir[i]);
                     }
-
                 }
-            
             }
 
             /// <summary>
             /// Метод переноса\удаления
             /// принимает файл в качестве аргумента, переносит в путь removePath
             /// </summary>
-            void RemoveFile(string pathToFile) 
+            void RemoveFile(string pathToFile)
             {
                 string newPath = $@"{removePath}{Path.GetFileName(pathToFile)}";
                 if (!File.Exists(newPath))
                 {
                     File.Move(pathToFile, newPath);
-                    Console.WriteLine($@"file {Path.GetFileName(pathToFile)} moved to RemovedCTL");
+                    WriteOK($@"file {Path.GetFileName(pathToFile)} moved to RemovedCTL");
                 }
-                else 
+                else
                 {
-                    Console.WriteLine();
+                    WriteError("File alredy exist in RemovedCTL folder");
                 }
-                
+            }
+
+            //Служебные
+            void WriteError(string message)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine(message);
+                Console.ResetColor();
+            }
+
+            void WriteOK(string message)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine(message);
+                Console.ResetColor();
             }
         }
-
-        void WriteError(string message) 
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-
-        void WriteOK(string message) 
-        {
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine(message);
-            Console.ResetColor();
-        }
-
     }
 }
