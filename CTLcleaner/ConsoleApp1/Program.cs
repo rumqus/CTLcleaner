@@ -11,14 +11,14 @@ namespace ConsoleApp1
     {
         static void Main(string[] args)
         {
-            string mainPath = $@"C:\Program Files (x86)\InfoTeCS\ViPNet Coordinator\out\ENV"; // корневой каталог в котором происходит поиск файлов
+            string mainPath = ""; // корневой каталог в котором происходит поиск файлов
             string removePath = $@"removedCTL\"; // папка в которую переносится файл
             string[] allDirs; // массив со всеми папками out
             string textPattern = "*.CTL"; // маска файлов
             double daysTriger = 14; // количество дней
             DateTime nowDate = DateTime.Now; // текущая дата, сегодняшний день
 
-
+            ReadPath();
             GetAllDirs();
             GetFilesInDir();
             Console.ReadLine();
@@ -102,6 +102,32 @@ namespace ConsoleApp1
                     WriteError("File alredy exist in RemovedCTL folder");
                 }
             }
+            /// <summary>
+            /// Метод получения пути с расположением папки ENV
+            /// принимает файл в качестве аргумента расположение path.ini(в самом path.ini указываем путь к файлу)
+            /// </summary>
+            void ReadPath() 
+            {
+                using (StreamReader reader = new StreamReader("path.ini"))
+                {
+                    string text = reader.ReadToEnd();
+                    
+                    mainPath = $@"{text}";
+                }
+                if (Directory.Exists(mainPath))
+                {
+                    WriteOK("Root Path checked OK");
+                }
+                else
+                {
+                    WriteError("Root Path FAILED");
+                    Console.ReadLine();
+                }
+
+            }
+
+
+
 
             //Служебные
             void WriteError(string message)
