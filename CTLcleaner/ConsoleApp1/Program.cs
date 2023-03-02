@@ -58,7 +58,11 @@ namespace ConsoleApp1
                         {
                             string[] tempLocalDir = Directory.GetFiles(allDirs[i], textPattern); // отбираем все файлы с расширением CTL
                             WriteOK($@"папка {allDirs[i]} считана - ОК");
-                            CompareFiles(tempLocalDir);
+                            for (int j = 0; j < tempLocalDir.Length; i++)
+                            {
+                                CompareFiles(tempLocalDir[j]);
+                            }
+                            
                         }
                     }
                 }
@@ -72,18 +76,27 @@ namespace ConsoleApp1
             /// Метод сравнения файлов с уловиями
             /// Перебирает файлы в каталоге и сравнивает с условиями
             /// </summary>
-            void CompareFiles(string[] tempDir)
+            void CompareFiles(string tempFile)
             {
-                for (int i = 0; i < tempDir.Length; i++)
+                DateTime fileDate = new FileInfo(tempFile).CreationTime; // получаем дату создания файла
+                Console.WriteLine($@"{tempFile} {fileDate.ToShortDateString()}");
+                TimeSpan diff = nowDate.Subtract(fileDate);
+                if (diff.TotalDays > daysTriger)
                 {
-                    DateTime fileDate = new FileInfo(tempDir[i]).CreationTime; // получаем дату создания файла
-                    Console.WriteLine($@"{tempDir[i]} {fileDate.ToShortDateString()}");
-                    TimeSpan diff = nowDate.Subtract(fileDate);
-                    if (diff.TotalDays > daysTriger)
-                    {
-                        RemoveFile(tempDir[i]);
-                    }
+                    RemoveFile(tempFile);
                 }
+
+
+                //for (int i = 0; i < tempDir.Length; i++)
+                //{
+                //    DateTime fileDate = new FileInfo(tempDir[i]).CreationTime; // получаем дату создания файла
+                //    Console.WriteLine($@"{tempDir[i]} {fileDate.ToShortDateString()}");
+                //    TimeSpan diff = nowDate.Subtract(fileDate);
+                //    if (diff.TotalDays > daysTriger)
+                //    {
+                //        RemoveFile(tempDir[i]);
+                //    }
+                //}
             }
 
             /// <summary>
