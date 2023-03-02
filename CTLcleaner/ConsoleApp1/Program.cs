@@ -18,9 +18,10 @@ namespace ConsoleApp1
             double daysTriger = 14; // количество дней
             DateTime nowDate = DateTime.Now; // текущая дата, сегодняшний день
 
-            ReadPath();
-            GetAllDirs();
-            GetFilesInDir();
+            // Основной поток выполнения 
+            ReadPath(); // получаем путь к папке ENV
+            GetAllDirs(); // Получаем все директории в ENV
+            GetFilesInDir(); // ищем м переносим файлы в целевой директории
             Console.ReadLine();
 
             /// <summary>
@@ -123,10 +124,7 @@ namespace ConsoleApp1
                     WriteError("Root Path FAILED");
                     Console.ReadLine();
                 }
-
             }
-
-
 
 
             //Служебные
