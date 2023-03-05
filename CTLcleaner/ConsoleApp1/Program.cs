@@ -18,6 +18,7 @@ namespace ConsoleApp1
             string textPattern = "*.CTL"; // маска файлов
             double daysTriger = 14; // количество дней
             DateTime trigerDate = DateTime.Now.AddDays(daysTriger); // текущая дата, сегодняшний день
+<<<<<<< Updated upstream
             List<string> tmp = new List<string>();
 
             // Основной поток выполнения 
@@ -28,6 +29,15 @@ namespace ConsoleApp1
             Console.WriteLine($@"В листе _{tmp.Count}_ объектов ");
             Console.ReadLine();
             RemoveFile(tmp); 
+=======
+
+            // Основной поток выполнения 
+            Console.WriteLine($@"Searching for CTLs older than {trigerDate}");
+            Console.WriteLine($@"{trigerDate}   {DateTime.Now}");
+            ReadPath(); // получаем путь к папке ENV
+            GetAllDirs(); // Получаем все директории в ENV
+            GetFilesInDir(); // ищем и переносим файлы в целевой директории
+>>>>>>> Stashed changes
             Console.ReadLine();
 
             /// <summary>
@@ -66,14 +76,25 @@ namespace ConsoleApp1
                 {
                     foreach (string dir in allDirs)
                     {
+<<<<<<< Updated upstream
                         List<string> currentDir = Directory.GetFiles($@"{dir}", textPattern).ToList();
                         if (currentDir.Count > 0)
                         {
                             foreach (string file in currentDir)
+=======
+                        List<string> currentDir = Directory.GetFiles(dir, textPattern).ToList();
+                        if (currentDir.Count > 0)
+                        {
+                            foreach (string file in currentDir) 
+>>>>>>> Stashed changes
                             {
                                 CompareFiles($@"{file}");
                             }
 
+<<<<<<< Updated upstream
+=======
+                            
+>>>>>>> Stashed changes
                         }
                     }
                 }
@@ -92,11 +113,20 @@ namespace ConsoleApp1
                 //List<string> tmp = new List<string>(); // лист в который пишем подходящие файлы в папке
                 DateTime fileDate = new FileInfo(tempFile).CreationTime; // получаем дату создания файла
                 Console.WriteLine($@"{tempFile} {fileDate}");
+<<<<<<< Updated upstream
                 TimeSpan diff = DateTime.Now.Subtract(fileDate);
                 if (diff.TotalDays > daysTriger)
+=======
+                TimeSpan diff = nowDate.Subtract(fileDate);
+                if (diff > daysTriger)
+>>>>>>> Stashed changes
                 {
                     tmp.Add($@"{tempFile}");
                 }
+                //if (diff.TotalDays > daysTriger)
+                //{
+                //    RemoveFile(tempFile);
+                //}
             }
 
             /// <summary>
