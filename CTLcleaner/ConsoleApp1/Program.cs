@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -16,28 +17,21 @@ namespace ConsoleApp1
             //string[] allDirs; // массив со всеми папками out
             string[] allDirs;
             string textPattern = "*.CTL"; // маска файлов
-            double daysTriger = 14; // количество дней
+            double daysTriger = 13; // количество дней
             DateTime trigerDate = DateTime.Now.AddDays(daysTriger); // текущая дата, сегодняшний день
-<<<<<<< Updated upstream
             List<string> tmp = new List<string>();
+            Stopwatch benchmark = new Stopwatch();
 
+            
             // Основной поток выполнения 
             Console.WriteLine($@"Searching for CTLs older than {trigerDate}");
+            Console.ReadLine();
             ReadPath(); // получаем путь к папке ENV
             GetAllDirs(); // Получаем все директории в ENV
             GetFilesInDir(); // ищем и переносим файлы в целевой директории
             Console.WriteLine($@"В листе _{tmp.Count}_ объектов ");
             Console.ReadLine();
             RemoveFile(tmp); 
-=======
-
-            // Основной поток выполнения 
-            Console.WriteLine($@"Searching for CTLs older than {trigerDate}");
-            Console.WriteLine($@"{trigerDate}   {DateTime.Now}");
-            ReadPath(); // получаем путь к папке ENV
-            GetAllDirs(); // Получаем все директории в ENV
-            GetFilesInDir(); // ищем и переносим файлы в целевой директории
->>>>>>> Stashed changes
             Console.ReadLine();
 
             /// <summary>
@@ -76,25 +70,14 @@ namespace ConsoleApp1
                 {
                     foreach (string dir in allDirs)
                     {
-<<<<<<< Updated upstream
-                        List<string> currentDir = Directory.GetFiles($@"{dir}", textPattern).ToList();
+                        List<string> currentDir = Directory.EnumerateFiles($@"{dir}", textPattern).ToList();
                         if (currentDir.Count > 0)
                         {
                             foreach (string file in currentDir)
-=======
-                        List<string> currentDir = Directory.GetFiles(dir, textPattern).ToList();
-                        if (currentDir.Count > 0)
-                        {
-                            foreach (string file in currentDir) 
->>>>>>> Stashed changes
                             {
                                 CompareFiles($@"{file}");
                             }
 
-<<<<<<< Updated upstream
-=======
-                            
->>>>>>> Stashed changes
                         }
                     }
                 }
@@ -113,20 +96,11 @@ namespace ConsoleApp1
                 //List<string> tmp = new List<string>(); // лист в который пишем подходящие файлы в папке
                 DateTime fileDate = new FileInfo(tempFile).CreationTime; // получаем дату создания файла
                 Console.WriteLine($@"{tempFile} {fileDate}");
-<<<<<<< Updated upstream
                 TimeSpan diff = DateTime.Now.Subtract(fileDate);
                 if (diff.TotalDays > daysTriger)
-=======
-                TimeSpan diff = nowDate.Subtract(fileDate);
-                if (diff > daysTriger)
->>>>>>> Stashed changes
                 {
                     tmp.Add($@"{tempFile}");
                 }
-                //if (diff.TotalDays > daysTriger)
-                //{
-                //    RemoveFile(tempFile);
-                //}
             }
 
             /// <summary>
@@ -135,18 +109,20 @@ namespace ConsoleApp1
             /// </summary>
             void RemoveFile(List<string> files)
             {
+                benchmark.Start();
                 if (files.Count > 0)
                 {
                     foreach (string fi in files)
                     {
-                        string newPath = $@"{removePath}{Path.GetFileName(fi)}";
+                        string newPath = Path.Combine(removePath,Path.GetFileName(fi));
                         FileInfo fileinfo = new FileInfo(fi);
                         //fileinfo.MoveTo(Path.Combine(rootDir, fileYear, fileMonth, fileName));
                         fileinfo.MoveTo($@"{newPath}");
                         //File.Move($@"{fi}", $@"{newPath}");
                     }
                 }
-                
+                benchmark.Stop();
+                Console.WriteLine($@"{benchmark.ElapsedMilliseconds}");
             }
             /// <summary>
             /// Метод получения пути с расположением папки ENV
