@@ -13,7 +13,8 @@ namespace ConsoleApp1
         {
             string mainPath = ""; // корневой каталог в котором происходит поиск файлов
             string removePath = $@"removedCTL\"; // папка в которую переносится файл
-            string[] allDirs; // массив со всеми папками out
+            //string[] allDirs; // массив со всеми папками out
+            string[] allDirs; 
             string textPattern = "*.CTL"; // маска файлов
             double daysTriger = 14; // количество дней
             DateTime nowDate = DateTime.Now; // текущая дата, сегодняшний день
@@ -30,17 +31,23 @@ namespace ConsoleApp1
             /// </summary>
             void GetAllDirs()
             {
-                allDirs = Directory.GetDirectories(mainPath);
-                if (allDirs != null)
+                allDirs = Directory.EnumerateDirectories(mainPath).ToArray();
+                //allDirs = Directory.GetDirectories(mainPath);
+                if (allDirs != null) 
                 {
-                    for (int i = 0; i < allDirs.Length; i++)
+                    WriteOK("root path OK");
+                    foreach(string dir in allDirs) 
                     {
-                        Console.WriteLine(allDirs[i]);
+                        if (Directory.Exists(dir))
+                        {
+                            WriteOK($@"PATH OK {dir}");
+                        }
+                        else 
+                        {
+                            WriteError($@"BAD PATH {dir}");
+                        }
+                        
                     }
-                }
-                else
-                {
-                    WriteError("ERROR - root array is null");
                 }
             }
 
@@ -52,17 +59,15 @@ namespace ConsoleApp1
             {
                 if (allDirs != null)
                 {
-                    for (int i = 0; i < allDirs.Length; i++)
+                    foreach (string dir in allDirs) 
                     {
-                        if (Directory.GetFiles(allDirs[i]).Length > 0)
+                        string[] currentDir = Directory.GetFiles(dir, textPattern);
+                        if (currentDir.Length > 0)
                         {
-                            string[] tempLocalDir = Directory.GetFiles(allDirs[i], textPattern); // отбираем все файлы с расширением CTL
-                            WriteOK($@"папка {allDirs[i]} считана - ОК");
-                            for (int j = 0; j < tempLocalDir.Length; i++)
+                            for (int i = 0; i < currentDir.Length; i++)
                             {
-                                CompareFiles(tempLocalDir[j]);
+                                CompareFiles(currentDir[i]);
                             }
-                            
                         }
                     }
                 }
@@ -85,18 +90,6 @@ namespace ConsoleApp1
                 {
                     RemoveFile(tempFile);
                 }
-
-
-                //for (int i = 0; i < tempDir.Length; i++)
-                //{
-                //    DateTime fileDate = new FileInfo(tempDir[i]).CreationTime; // получаем дату создания файла
-                //    Console.WriteLine($@"{tempDir[i]} {fileDate.ToShortDateString()}");
-                //    TimeSpan diff = nowDate.Subtract(fileDate);
-                //    if (diff.TotalDays > daysTriger)
-                //    {
-                //        RemoveFile(tempDir[i]);
-                //    }
-                //}
             }
 
             /// <summary>
@@ -130,11 +123,11 @@ namespace ConsoleApp1
                 }
                 if (Directory.Exists(mainPath))
                 {
-                    WriteOK("Root Path checked OK");
+                    WriteOK("path.ini - read OK");
                 }
                 else
                 {
-                    WriteError("Root Path FAILED");
+                    WriteError("path.ini - FAILED");
                     Console.ReadLine();
                 }
             }
