@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,14 +14,24 @@ namespace ConsoleApp1
         {
             string mainPath = ""; // корневой каталог в котором происходит поиск файлов
             string removePath = $@"removedCTL\"; // папка в которую переносится файл
-            string[] allDirs; // массив со всеми папками out
+            //string[] allDirs; // массив со всеми папками out
+            string[] allDirs;
             string textPattern = "*.CTL"; // маска файлов
-            double daysTriger = 14; // количество дней
-            DateTime nowDate = DateTime.Now; // текущая дата, сегодняшний день
+            double daysTriger = 13; // количество дней
+            DateTime trigerDate = DateTime.Now.AddDays(daysTriger); // текущая дата, сегодняшний день
+            List<string> tmp = new List<string>();
+            Stopwatch benchmark = new Stopwatch();
 
-            ReadPath();
-            GetAllDirs();
-            GetFilesInDir();
+            
+            // Основной поток выполнения 
+            Console.WriteLine($@"Searching for CTLs older than {trigerDate}");
+            Console.ReadLine();
+            ReadPath(); // получаем путь к папке ENV
+            GetAllDirs(); // Получаем все директории в ENV
+            GetFilesInDir(); // ищем и переносим файлы в целевой директории
+            Console.WriteLine($@"В листе _{tmp.Count}_ объектов ");
+            Console.ReadLine();
+            RemoveFile(tmp); 
             Console.ReadLine();
 
             /// <summary>
@@ -29,17 +40,23 @@ namespace ConsoleApp1
             /// </summary>
             void GetAllDirs()
             {
-                allDirs = Directory.GetDirectories(mainPath);
+                allDirs = Directory.EnumerateDirectories(mainPath).ToArray();
+                //allDirs = Directory.GetDirectories(mainPath);
                 if (allDirs != null)
                 {
-                    for (int i = 0; i < allDirs.Length; i++)
+                    WriteOK("root path OK");
+                    foreach (string dir in allDirs)
                     {
-                        Console.WriteLine(allDirs[i]);
+                        if (Directory.Exists(dir))
+                        {
+                            WriteOK($@"PATH OK {dir}");
+                        }
+                        else
+                        {
+                            WriteError($@"BAD PATH {dir}");
+                        }
+
                     }
-                }
-                else
-                {
-                    WriteError("ERROR - root array is null");
                 }
             }
 
@@ -51,13 +68,16 @@ namespace ConsoleApp1
             {
                 if (allDirs != null)
                 {
-                    for (int i = 0; i < allDirs.Length; i++)
+                    foreach (string dir in allDirs)
                     {
-                        if (Directory.GetFiles(allDirs[i]).Length > 0)
+                        List<string> currentDir = Directory.EnumerateFiles($@"{dir}", textPattern).ToList();
+                        if (currentDir.Count > 0)
                         {
-                            string[] tempLocalDir = Directory.GetFiles(allDirs[i], textPattern); // отбираем все файлы с расширением CTL
-                            WriteOK($@"папка {allDirs[i]} считана - ОК");
-                            CompareFiles(tempLocalDir);
+                            foreach (string file in currentDir)
+                            {
+                                CompareFiles($@"{file}");
+                            }
+
                         }
                     }
                 }
@@ -71,17 +91,15 @@ namespace ConsoleApp1
             /// Метод сравнения файлов с уловиями
             /// Перебирает файлы в каталоге и сравнивает с условиями
             /// </summary>
-            void CompareFiles(string[] tempDir)
+            void CompareFiles(string tempFile)
             {
-                for (int i = 0; i < tempDir.Length; i++)
+                //List<string> tmp = new List<string>(); // лист в который пишем подходящие файлы в папке
+                DateTime fileDate = new FileInfo(tempFile).CreationTime; // получаем дату создания файла
+                Console.WriteLine($@"{tempFile} {fileDate}");
+                TimeSpan diff = DateTime.Now.Subtract(fileDate);
+                if (diff.TotalDays > daysTriger)
                 {
-                    DateTime fileDate = new FileInfo(tempDir[i]).CreationTime; // получаем дату создания файла
-                    Console.WriteLine($@"{tempDir[i]} {fileDate.ToShortDateString()}");
-                    TimeSpan diff = nowDate.Subtract(fileDate);
-                    if (diff.TotalDays > daysTriger)
-                    {
-                        RemoveFile(tempDir[i]);
-                    }
+                    tmp.Add($@"{tempFile}");
                 }
             }
 
@@ -89,45 +107,45 @@ namespace ConsoleApp1
             /// Метод переноса\удаления
             /// принимает файл в качестве аргумента, переносит в путь removePath
             /// </summary>
-            void RemoveFile(string pathToFile)
+            void RemoveFile(List<string> files)
             {
-                string newPath = $@"{removePath}{Path.GetFileName(pathToFile)}";
-                if (!File.Exists(newPath))
+                benchmark.Start();
+                if (files.Count > 0)
                 {
-                    File.Move(pathToFile, newPath);
-                    WriteOK($@"file {Path.GetFileName(pathToFile)} moved to RemovedCTL");
+                    foreach (string fi in files)
+                    {
+                        string newPath = Path.Combine(removePath,Path.GetFileName(fi));
+                        FileInfo fileinfo = new FileInfo(fi);
+                        //fileinfo.MoveTo(Path.Combine(rootDir, fileYear, fileMonth, fileName));
+                        fileinfo.MoveTo($@"{newPath}");
+                        //File.Move($@"{fi}", $@"{newPath}");
+                    }
                 }
-                else
-                {
-                    WriteError("File alredy exist in RemovedCTL folder");
-                }
+                benchmark.Stop();
+                Console.WriteLine($@"{benchmark.ElapsedMilliseconds}");
             }
             /// <summary>
             /// Метод получения пути с расположением папки ENV
             /// принимает файл в качестве аргумента расположение path.ini(в самом path.ini указываем путь к файлу)
             /// </summary>
-            void ReadPath() 
+            void ReadPath()
             {
                 using (StreamReader reader = new StreamReader("path.ini"))
                 {
                     string text = reader.ReadToEnd();
-                    
+
                     mainPath = $@"{text}";
                 }
                 if (Directory.Exists(mainPath))
                 {
-                    WriteOK("Root Path checked OK");
+                    WriteOK("path.ini - read OK");
                 }
                 else
                 {
-                    WriteError("Root Path FAILED");
+                    WriteError("path.ini - FAILED");
                     Console.ReadLine();
                 }
-
             }
-
-
-
 
             //Служебные
             void WriteError(string message)
